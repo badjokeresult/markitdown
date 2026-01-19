@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
   "markitdown>=0.1.0a1",
   "mammoth",
+  "beautifulsoup4",
 ]
 
 [project.urls]
