@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = "MIT"
 keywords = []
 authors = [
-  { name = "Adam Fourney", email = "adamfo@microsoft.com" },
+  { name = "badjokeresult", email = "badjokeresult@gmail.com" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",

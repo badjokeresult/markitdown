@@ -70,13 +70,50 @@ class CustomDocxConverter(DocumentConverter):
                     extension = href.split(".")[-1].lower()
                     if ".fld/" in href and extension.endswith((".png", ".jpg", ".jpeg", ".gif")):
                         markdown.append(self.__process_image(href, extension))
-        return "\n".join(markdown)
+        return "\n\n".join(markdown)
 
     def __process_table(
         self,
         table_content: str,
     ) -> str:
-        pass
+        soup = BeautifulSoup(table_content, "html.parser")
+        table_root = soup.find("table")
+        for element in table_root:
+            rows = element.find_all("tr")
+            for row in rows:
+                cells = row.find_all(("td", "th"))
+                for cell in cells:
+                    if {"colspan", "rowspan"} <= set(cell.attrs):
+                        return self.__process_complicated_table(table_content)
+        return self.__process_simple_table(table_content)
+
+
+    def __process_simple_table(
+        self,
+        table_content: str,
+    ) -> str:
+        converter = MarkItDown()
+        result = converter.convert(table_content)
+        return result.text_content
+
+    def __process_complicated_table(
+        self,
+        table_content: str,
+    ) -> str:
+        soup = BeautifulSoup(table_content, "html.parser")
+        table_root = soup.find("table")
+        for element in table_root:
+            rows = element.find_all("tr")
+            for row in rows:
+                cells = row.find_all(("td", "th"))
+                for cell in cells:
+                    garbage = []
+                    for attr in cell.attrs:
+                        if attr not in ("colspan", "rowspan"):
+                            garbage.append(attr)
+                    for attr in garbage:
+                        del cell[attr]
+        return str(soup)
 
     def __process_image(
         self,
